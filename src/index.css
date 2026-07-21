@@ -12,17 +12,11 @@ html {
 
 body {
   background-color: #0E1F33;
-  background-image:
-    linear-gradient(to right, rgba(110, 147, 183, 0.10) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(110, 147, 183, 0.10) 1px, transparent 1px);
-  background-size: 48px 48px;
-  background-attachment: fixed;
   color: #EDE8DC;
   font-family: "IBM Plex Sans", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
 
 /* Drafting-paper grid texture */
 .bp-grid {

@@ -1,22 +1,18 @@
 import { motion } from "framer-motion";
 import { useReducedMotion } from "../hooks/useReducedMotion";
-import TickMarks from "./TickMarks";
 
-const panels = [
+const items = [
   {
-    index: "01",
-    title: "AI Automation",
-    body: "Event-driven n8n workflows that connect triggers, AI agents, and APIs into reliable pipelines — replacing repetitive ops work with systems that run themselves.",
+    label: "AI AUTOMATION",
+    desc: "n8n workflows, agentic systems, and Claude-powered pipelines that replace manual ops.",
   },
   {
-    index: "02",
-    title: "Full-Stack Systems",
-    body: "Supabase-backed applications with typed APIs, auth, and row-level security — production architectures that scale from prototype to real users without rewrites.",
+    label: "FULL-STACK APPS",
+    desc: "React + TypeScript frontends on Supabase backends, shipped to production.",
   },
   {
-    index: "03",
-    title: "Self-Hosted Infrastructure",
-    body: "Self-hosted AI agents and tooling deployed on your own hardware — keeping data, models, and compute under your control instead of a third-party's.",
+    label: "BUSINESS OS",
+    desc: "All-in-one platforms bundling CRM, accounting, and operations into one system.",
   },
 ];
 
@@ -24,11 +20,8 @@ export default function WhatIBuild() {
   const reduced = useReducedMotion();
 
   return (
-    <section id="services" className="relative bp-grid py-24 md:py-32">
-      <div className="relative mx-auto max-w-7xl px-6 md:px-10">
-        <TickMarks />
-
-        {/* section header */}
+    <section className="relative border-t border-blueprint-grid/15 bg-blueprint-surface/30 py-24 md:py-32">
+      <div className="mx-auto max-w-7xl px-6 md:px-10">
         <motion.div
           initial={reduced ? false : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -38,43 +31,31 @@ export default function WhatIBuild() {
         >
           <div className="mb-4 flex items-center gap-3 font-mono text-[11px] tracking-annotation text-blueprint-muted">
             <span className="h-px w-8 bg-blueprint-brass/70" />
-            SECTION 02 — CAPABILITIES
+            SCOPE OF WORK
           </div>
           <h2 className="font-mono text-3xl font-bold text-blueprint-paper sm:text-4xl">
             What I Build
           </h2>
         </motion.div>
 
-        <div className="grid gap-px bg-blueprint-grid/15 md:grid-cols-3">
-          {panels.map((p, i) => (
-            <motion.article
-              key={p.index}
-              initial={reduced ? false : { opacity: 0, y: 24 }}
+        <div className="grid grid-cols-1 gap-px border-t border-l border-blueprint-grid/20 bg-blueprint-grid/10 md:grid-cols-3">
+          {items.map((it, i) => (
+            <motion.div
+              key={it.label}
+              initial={reduced ? false : { opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.5, delay: i * 0.1, ease: "easeOut" }}
-              className="group relative bg-blueprint-bg p-8 md:p-10"
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.45, delay: i * 0.08, ease: "easeOut" }}
+              className="relative border-b border-r border-blueprint-grid/20 bg-blueprint-bg/40 p-8 md:p-10"
             >
-              {/* brass edge accent — brightens on hover */}
-              <span className="absolute left-0 top-0 h-full w-[2px] bg-blueprint-brass/25 transition-colors duration-300 group-hover:bg-blueprint-brass" />
-
-              {/* index label */}
-              <div className="mb-8 font-mono text-[11px] tracking-annotation text-blueprint-muted">
-                <span className="text-blueprint-brass">{p.index}</span>
-                <span className="mx-2 text-blueprint-grid/50">/</span>
-                <span>03</span>
+              <span className="absolute left-0 top-0 h-px w-10 bg-blueprint-brass/60" />
+              <div className="mb-3 font-mono text-[11px] tracking-annotation text-blueprint-brass/80">
+                {it.label}
               </div>
-
-              <h3 className="font-mono text-xl font-semibold text-blueprint-paper">
-                {p.title}
-              </h3>
-              <p className="mt-4 font-sans text-[15px] leading-relaxed text-blueprint-muted">
-                {p.body}
+              <p className="font-sans text-[14px] leading-relaxed text-blueprint-muted">
+                {it.desc}
               </p>
-
-              {/* corner tick on each panel */}
-              <span className="absolute right-3 top-3 h-3 w-3 border-r border-t border-blueprint-grid/30 transition-colors duration-300 group-hover:border-blueprint-brass/60" />
-            </motion.article>
+            </motion.div>
           ))}
         </div>
       </div>

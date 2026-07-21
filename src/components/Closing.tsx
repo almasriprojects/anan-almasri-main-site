@@ -1,57 +1,39 @@
 import { motion } from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
 import { useReducedMotion } from "../hooks/useReducedMotion";
-import TickMarks from "./TickMarks";
 
 export default function Closing() {
   const reduced = useReducedMotion();
 
   return (
-    <section
-      id="contact"
-      className="relative bp-grid border-t border-blueprint-grid/15 py-28 md:py-36"
-    >
-      <div className="relative mx-auto max-w-3xl px-6 text-center md:px-10">
-        <TickMarks />
-
+    <section className="relative bp-grid border-t border-blueprint-grid/15 py-24 md:py-32">
+      <div className="mx-auto max-w-7xl px-6 md:px-10">
         <motion.div
           initial={reduced ? false : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.5, ease: "easeOut" }}
+          className="relative border border-blueprint-grid/20 bg-blueprint-surface/50 p-8 md:p-12"
         >
-          <div className="mb-6 inline-flex items-center gap-3 font-mono text-[11px] tracking-annotation text-blueprint-muted">
-            <span className="h-px w-8 bg-blueprint-brass/70" />
-            END OF SPEC
-            <span className="h-px w-8 bg-blueprint-brass/70" />
-          </div>
+          <span className="absolute left-0 top-0 h-[2px] w-full bg-blueprint-brass/70" />
+          <span className="absolute right-3 top-3 h-3 w-3 border-r border-t border-blueprint-brass/50" />
+          <span className="absolute bottom-3 left-3 h-3 w-3 border-b border-l border-blueprint-brass/50" />
 
-          <h2 className="font-mono text-3xl font-bold leading-tight text-blueprint-paper sm:text-4xl md:text-5xl">
-            Let's draft the next system.
+          <div className="mb-3 font-mono text-[11px] tracking-annotation text-blueprint-muted">
+            END OF DRAWING SET
+          </div>
+          <h2 className="font-mono text-2xl font-bold text-blueprint-paper sm:text-3xl">
+            Let's build something precise.
           </h2>
-
-          <p className="mx-auto mt-6 max-w-xl font-sans text-lg text-blueprint-muted">
-            If you have a process that should run itself, a stack that should
-            scale, or an idea worth engineering — book a consultation and we'll
-            map it out.
+          <p className="mt-4 max-w-xl font-sans text-[15px] leading-relaxed text-blueprint-muted">
+            Available for AI automation, full-stack product builds, and systems
+            architecture. Based in Miami — working globally.
           </p>
-
-          <div className="mt-10">
-            <a
-              href="#contact"
-              className="group inline-flex items-center gap-2 bg-blueprint-brass px-7 py-3.5 font-mono text-sm tracking-annotation text-blueprint-bg transition-all duration-200 hover:bg-[#d8b06a] hover:shadow-[0_0_24px_-4px_rgba(201,161,93,0.5)]"
-            >
-              Book a Consultation
-              <ArrowUpRight
-                size={16}
-                className="transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-              />
-            </a>
-          </div>
-
-          <div className="mt-12 font-mono text-[10px] tracking-annotation text-blueprint-muted/60">
-            ANAN ALMASRI · MIAMI, FL · 2025
-          </div>
+          <a
+            href="mailto:hello@example.com"
+            className="mt-8 inline-flex items-center gap-2 rounded-sm bg-blueprint-brass px-5 py-3 font-mono text-[12px] font-semibold tracking-annotation text-blueprint-bg transition-colors duration-200 hover:bg-blueprint-brass/90"
+          >
+            INITIATE CONTACT
+          </a>
         </motion.div>
       </div>
     </section>

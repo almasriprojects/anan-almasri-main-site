@@ -12,11 +12,7 @@ const links = [
   { label: "Contact", href: "#contact" },
 ];
 
-interface NavbarProps {
-  onAdminClick: () => void;
-}
-
-export default function Navbar({ onAdminClick }: NavbarProps) {
+export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const reduced = useReducedMotion();
@@ -69,12 +65,12 @@ export default function Navbar({ onAdminClick }: NavbarProps) {
           </ul>
 
           <div className="hidden md:block">
-            <button
-              onClick={onAdminClick}
+            <a
+              href="#contact"
               className="font-mono text-[13px] tracking-annotation text-blueprint-brass border border-blueprint-brass/60 px-4 py-2 transition-colors duration-200 hover:bg-blueprint-brass/10 hover:border-blueprint-brass"
             >
-              Admin Login
-            </button>
+              Book a Call
+            </a>
           </div>
 
           {/* Mobile toggle */}
@@ -137,15 +133,13 @@ export default function Navbar({ onAdminClick }: NavbarProps) {
                 transition={{ delay: 0.08 + links.length * 0.06, duration: 0.3 }}
                 className="mt-8"
               >
-                <button
-                  onClick={() => {
-                    setOpen(false);
-                    onAdminClick();
-                  }}
-                  className="block border border-blueprint-brass px-4 py-3 text-center font-mono tracking-annotation text-blueprint-brass w-full"
+                <a
+                  href="#contact"
+                  onClick={() => setOpen(false)}
+                  className="block border border-blueprint-brass px-4 py-3 text-center font-mono tracking-annotation text-blueprint-brass"
                 >
-                  Admin Login
-                </button>
+                  Book a Call
+                </a>
               </motion.li>
             </ul>
           </motion.div>
