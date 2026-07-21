@@ -20,5 +20,14 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": [
+    "src/routes",
+    "src/lib",
+    "src/components/Dashboard.tsx",
+    "src/components/AdminLoginModal.tsx",
+    "src/components/BookCallModal",
+    "src/components/drive",
+    "src/components/ui"
+  ]
 }

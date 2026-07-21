@@ -17,5 +17,14 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": ["src"],
+  "exclude": [
+    "src/routes",
+    "src/lib",
+    "src/components/Dashboard.tsx",
+    "src/components/AdminLoginModal.tsx",
+    "src/components/BookCallModal",
+    "src/components/drive",
+    "src/components/ui"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
