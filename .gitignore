@@ -1,0 +1,68 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# Build output
+dist/
+dist-ssr/
+build/
+*.tsbuildinfo
+
+# TanStack Router generated files
+src/routeTree.gen.ts
+
+# TanStack dev cache
+.tanstack/
+
+# Local env files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Editor / OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.example
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*~
+
+# Coverage / cache
+coverage/
+.cache/
+.eslintcache
+.parcel-cache/
+.vite/
+
+# Docker
+.dockerignore.bak
+
+# Misc
+*.local
+*.pid
+*.seed
+*.pid.lock

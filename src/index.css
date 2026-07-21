@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #0E1F33;
+  background-image:
+    linear-gradient(to right, rgba(110, 147, 183, 0.10) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(110, 147, 183, 0.10) 1px, transparent 1px);
+  background-size: 48px 48px;
+  background-attachment: fixed;
+  color: #EDE8DC;
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+/* Drafting-paper grid texture */
+.bp-grid {
+  background-image:
+    linear-gradient(to right, rgba(110, 147, 183, 0.10) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(110, 147, 183, 0.10) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.bp-grid-fine {
+  background-image:
+    linear-gradient(to right, rgba(110, 147, 183, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(110, 147, 183, 0.06) 1px, transparent 1px);
+  background-size: 48px 48px,
+    48px 48px;
+}
+
+/* Brass focus ring for accessibility */
+*:focus-visible {
+  outline: 2px solid #C9A15D;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
