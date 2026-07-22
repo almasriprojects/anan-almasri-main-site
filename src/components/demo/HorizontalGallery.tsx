@@ -53,6 +53,15 @@ export default function HorizontalGallery() {
     const onWheel = (e: WheelEvent) => {
       // Only hijack if the user is scrolling vertically.
       if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+
+      // Let the event fall through to normal page scroll once the rail has
+      // nowhere left to go in that direction, so the wheel doesn't get
+      // trapped here forever (e.g. stuck unable to reach the chat section).
+      const maxScrollLeft = rail.scrollWidth - rail.clientWidth;
+      const atStart = rail.scrollLeft <= 0;
+      const atEnd = rail.scrollLeft >= maxScrollLeft - 1;
+      if ((e.deltaY < 0 && atStart) || (e.deltaY > 0 && atEnd)) return;
+
       e.preventDefault();
       rail.scrollLeft += e.deltaY;
       bumpInteraction();

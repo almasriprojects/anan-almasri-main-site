@@ -214,6 +214,16 @@ export default function PlottingHero() {
             >
               EXPLORE BLUEPRINT ↓
             </motion.a>
+            <motion.a
+              href="/resume.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              whileHover={reduced ? undefined : { y: -2 }}
+              whileTap={reduced ? undefined : { scale: 0.97 }}
+              className="inline-flex items-center gap-2 px-2 py-3 font-mono text-sm tracking-annotation text-blueprint-muted underline decoration-blueprint-grid/40 underline-offset-4 transition-colors duration-200 hover:text-blueprint-brass"
+            >
+              DOWNLOAD RÉSUMÉ
+            </motion.a>
           </motion.div>
 
           {/* Coordinate / caption */}

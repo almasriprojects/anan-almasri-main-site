@@ -2,27 +2,28 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useScroll, useSpring } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { useReducedMotion } from "../hooks/useReducedMotion";
+import { useActiveSection } from "../hooks/useActiveSection";
 import { motionTokens } from "../lib/motion";
 
-const links = [
+const DEFAULT_LINKS = [
   { label: "Home", href: "#top" },
-  { label: "Projects", href: "#projects" },
   { label: "Skills", href: "#whatibuild" },
+  { label: "Projects", href: "#projects" },
   { label: "Experience", href: "#experience" },
   { label: "Contact", href: "#contact" },
 ];
 
-const sectionIds = links.map((l) => l.href.slice(1));
-
 interface NavbarProps {
   onLoginClick?: () => void;
+  links?: { label: string; href: string }[];
 }
 
-export default function Navbar({ onLoginClick }: NavbarProps = {}) {
+export default function Navbar({ onLoginClick, links = DEFAULT_LINKS }: NavbarProps = {}) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-  const [active, setActive] = useState<string>("top");
   const reduced = useReducedMotion();
+  const sectionIds = links.map((l) => l.href.slice(1));
+  const active = useActiveSection(sectionIds);
 
   // ── Scroll progress (lives INSIDE the header, on its bottom edge) ──
   const { scrollYProgress } = useScroll();
@@ -45,33 +46,6 @@ export default function Navbar({ onLoginClick }: NavbarProps = {}) {
       document.body.style.overflow = "";
     };
   }, [open]);
-
-  // Active section: pick the one closest to the top of the viewport.
-  useEffect(() => {
-    let raf = 0;
-    const onScroll = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        const probe = window.innerHeight * 0.3; // 30% down
-        let best: { id: string; dist: number } | null = null;
-        for (const id of sectionIds) {
-          const el = document.getElementById(id);
-          if (!el) continue;
-          const rect = el.getBoundingClientRect();
-          if (rect.bottom < 0 || rect.top > window.innerHeight) continue;
-          const dist = Math.abs(rect.top - probe);
-          if (!best || dist < best.dist) best = { id, dist };
-        }
-        if (best) setActive(best.id);
-      });
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      cancelAnimationFrame(raf);
-    };
-  }, []);
 
   // ── Magic-line: measure the active link's position so we can draw
   //    a single absolute underline that glides between items.

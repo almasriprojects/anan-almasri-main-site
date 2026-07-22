@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { ExternalLink } from "lucide-react";
 import type { Project } from "../../data/projectsData";
 import { motionTokens } from "../../lib/motion";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
@@ -39,11 +40,38 @@ export default function ProjectSheet({ project, index, total, active }: Props) {
         <span className="text-blueprint-brass">SHEET {project.sheetNo} / {String(total).padStart(2, "0")}</span>
         <span className="h-px flex-1 bg-blueprint-grid/20" />
         <span className="text-blueprint-brass/80">{project.type.toUpperCase()}</span>
+        {project.url && (
+          <>
+            <span className="h-px w-4 bg-blueprint-grid/20" />
+            <a
+              href={project.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="inline-flex items-center gap-1 border border-blueprint-brass/50 bg-blueprint-brass/10 px-2 py-1 text-blueprint-brass transition-colors hover:bg-blueprint-brass/20"
+            >
+              VISIT LIVE
+              <ExternalLink size={11} strokeWidth={2} />
+            </a>
+          </>
+        )}
       </div>
 
       <h3 className="font-mono text-3xl font-bold leading-tight text-blueprint-paper md:text-5xl">
         {project.title}
       </h3>
+
+      {project.image && (
+        <div className="relative mt-6 aspect-[16/7] w-full shrink-0 overflow-hidden border border-blueprint-grid/20 bg-blueprint-bg">
+          <img
+            src={project.image}
+            alt={`${project.title} live product screenshot`}
+            className="h-full w-full object-cover object-top"
+            loading="lazy"
+          />
+          <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-blueprint-bg/70 via-transparent to-transparent" />
+        </div>
+      )}
 
       {/* Quadrants */}
       <div className="mt-6 grid flex-1 grid-cols-1 gap-px bg-blueprint-grid/15 md:grid-cols-2">

@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { motion } from "framer-motion";
 import { motionTokens } from "../../lib/motion";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
@@ -29,6 +29,16 @@ export default function IdentityGate({ onCaptured }: Props) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const nameRef = useRef<HTMLInputElement | null>(null);
+  const emailRef = useRef<HTMLInputElement | null>(null);
+
+  // Focus the active step's input without yanking the page scroll to it —
+  // this card sits deep in the page, so a plain `autoFocus` would force a
+  // scroll-jack down to it as soon as the component mounts.
+  useEffect(() => {
+    const el = step === 1 ? nameRef.current : emailRef.current;
+    el?.focus({ preventScroll: true });
+  }, [step]);
 
   const submitName = (e: FormEvent) => {
     e.preventDefault();
@@ -86,8 +96,8 @@ export default function IdentityGate({ onCaptured }: Props) {
                 FULL NAME
               </label>
               <input
+                ref={nameRef}
                 type="text"
-                autoFocus
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Anan Almasri"
@@ -124,8 +134,8 @@ export default function IdentityGate({ onCaptured }: Props) {
                 EMAIL ADDRESS
               </label>
               <input
+                ref={emailRef}
                 type="email"
-                autoFocus
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@company.com"

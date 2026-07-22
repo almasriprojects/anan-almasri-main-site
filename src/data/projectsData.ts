@@ -6,24 +6,42 @@ export type Project = {
   solution: string;
   stack: string;
   result: string;
+  url?: string;
+  image?: string;
 };
 
 export const projects: Project[] = [
   {
     sheetNo: "01",
-    title: "AnanOS",
-    type: "Business OS",
+    title: "AnanBooks",
+    type: "Accounting / Ledger",
+    url: "https://ananbooks.ananalmasri.com",
+    image: "/projects/ananbooks.png",
     problem:
-      "Small businesses juggle five to ten separate subscriptions to run CRM, accounting, and operations — none of them talk to each other.",
+      "SMBs juggle disconnected spreadsheets and subscriptions for chart of accounts, banking, and invoicing — none of it reconciles cleanly or holds up to an audit.",
     solution:
-      "AnanOS is a self-hosted, all-in-one business operating system combining a CRM module and full accounting software, with AI woven through every part of it.",
+      "AnanBooks (AnanOS Ledger Suite) is a self-hosted double-entry accounting system: hierarchical multi-currency chart of accounts, a reconciled general ledger with bank feeds, and full AR/AP invoicing and billing cycles in one place.",
     stack:
       "React, Tailwind CSS, Supabase, n8n, Claude API, Docker on a self-hosted VPS.",
     result:
-      "Bundled as the centerpiece of the AI Business Stack package — one system replacing an entire subscription stack.",
+      "A single audit-tracked double-entry spine — chart of accounts, ledger, and AR/AP — replacing a stack of disconnected finance tools.",
   },
   {
     sheetNo: "02",
+    title: "AnanCRM",
+    type: "AI-Native CRM",
+    url: "https://crm.ananalmasri.com",
+    image: "/projects/anancrm.png",
+    problem:
+      "Sales teams juggle a pipeline tool, a contacts database, and a quoting tool that don't share context — and still can't just ask a plain-language question about their own data.",
+    solution:
+      "AnanCRM is an AI-native CRM: a drag-to-move deals Kanban with stalled-deal detection, searchable contacts/companies with linked deals and interaction history, a line-item quote editor with auto-calculated totals, and a natural-language layer over all of it.",
+    stack: "React, Tailwind CSS, Supabase, Claude API.",
+    result:
+      "One system for pipeline, contacts, and quotes — with the ability to ask it questions directly instead of building a report.",
+  },
+  {
+    sheetNo: "03",
     title: "Pocket CFO",
     type: "Financial Dashboard",
     problem:
@@ -35,9 +53,11 @@ export const projects: Project[] = [
       "The AI chat functions as both an analyst answering direct questions and a proactive advisor flagging issues before they're asked about.",
   },
   {
-    sheetNo: "03",
+    sheetNo: "04",
     title: "ANORA",
     type: "Automation",
+    url: "https://anora.ananalmasri.com",
+    image: "/projects/anora.png",
     problem:
       "Turning a stack of bank statement PDFs into a categorized profit-and-loss report is slow, manual, and error-prone — especially catching duplicate or false-positive transfers.",
     solution:
@@ -47,7 +67,7 @@ export const projects: Project[] = [
       "~4-second PDF-to-P&L turnaround, plus fully automated recurring cross-tool reporting with zero manual assembly.",
   },
   {
-    sheetNo: "04",
+    sheetNo: "05",
     title: "RAQEEB",
     type: "Contract AI",
     problem:
@@ -59,7 +79,7 @@ export const projects: Project[] = [
       "Automated risk flagging and counter-language generation running alongside a scheduled reminder system.",
   },
   {
-    sheetNo: "05",
+    sheetNo: "06",
     title: "SignDeal",
     type: "E-Signature",
     problem:
@@ -72,7 +92,7 @@ export const projects: Project[] = [
       "Fully bilingual, legally-structured e-signature documents rendering correctly in both languages.",
   },
   {
-    sheetNo: "06",
+    sheetNo: "07",
     title: "EatSafe",
     type: "Consumer App",
     problem:
@@ -84,7 +104,7 @@ export const projects: Project[] = [
     result: "A clear 4-tier safety rating any consumer can act on instantly.",
   },
   {
-    sheetNo: "07",
+    sheetNo: "08",
     title: "Baiti.ai",
     type: "PropTech Marketplace",
     problem:
@@ -96,7 +116,7 @@ export const projects: Project[] = [
       "An 846-feature specification ready to build against, with compliance handled from the ground up rather than bolted on after.",
   },
   {
-    sheetNo: "08",
+    sheetNo: "09",
     title: "Mizaan",
     type: "Business OS",
     problem:
@@ -108,7 +128,7 @@ export const projects: Project[] = [
       "Currently in a two-week manual validation sprint — 25 outreach messages, 10 discovery interviews, 3 manual audits — before any code is written, to validate demand first.",
   },
   {
-    sheetNo: "09",
+    sheetNo: "10",
     title: "Multi-Agent Build System",
     type: "Dev Infrastructure",
     problem:

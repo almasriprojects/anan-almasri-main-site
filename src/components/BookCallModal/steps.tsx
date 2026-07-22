@@ -228,18 +228,24 @@ export function Step2({
           />
         </Field>
 
-        <Field label="PROJECT TYPE">
+        <Field label="HIRING OR PROJECT TYPE">
           <select
             value={form.projectType}
             onChange={(e) => update("projectType", e.target.value)}
             className={inputClass()}
           >
             <option value="">Select one (optional)</option>
-            <option value="n8n-workflow">n8n Workflow</option>
-            <option value="ai-agent">AI Agent</option>
-            <option value="full-stack">Full-Stack App</option>
-            <option value="consulting">Consulting / Strategy</option>
-            <option value="other">Other</option>
+            <optgroup label="Hiring">
+              <option value="hire-fulltime">Hiring — Full-time Role</option>
+              <option value="hire-contract">Hiring — Contract / Fractional</option>
+            </optgroup>
+            <optgroup label="Project">
+              <option value="n8n-workflow">n8n Workflow</option>
+              <option value="ai-agent">AI Agent</option>
+              <option value="full-stack">Full-Stack App</option>
+              <option value="consulting">Consulting / Strategy</option>
+              <option value="other">Other</option>
+            </optgroup>
           </select>
         </Field>
 

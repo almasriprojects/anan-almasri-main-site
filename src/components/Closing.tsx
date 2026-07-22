@@ -31,8 +31,9 @@ export default function Closing() {
             Let's build something precise.
           </h2>
           <p className="mt-4 max-w-xl font-sans text-[15px] leading-relaxed text-blueprint-muted">
-            Available for AI automation, full-stack product builds, and systems
-            architecture. Based in Miami — working globally.
+            Available to hire for a role, or to bring on for a project — AI
+            automation, full-stack product builds, and systems architecture.
+            Based in Miami — working globally.
           </p>
 
           {/* INITIATE CONTACT — opens BookCallModal (same behavior as BOOK A CALL) */}
