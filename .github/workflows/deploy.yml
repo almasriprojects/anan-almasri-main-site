@@ -1,0 +1,79 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Git ref to deploy (branch, tag, or SHA). Default: main."
+        required: false
+        default: "main"
+        type: string
+
+# Two pushes in a row must not race the same compose file. The newest job
+# waits for the previous one to finish, then runs.
+concurrency:
+  group: deploy-vps
+  cancel-in-progress: false
+
+# Pinned to a single, very specific label. No other workflow in this org
+# (or any other org) can ever schedule a job on this runner.
+jobs:
+  deploy:
+    name: Pull, build, restart, healthcheck
+    runs-on: [self-hosted, anan-blueprint-vps]
+    timeout-minutes: 10
+    env:
+      REPO_DIR: /srv/anan-blueprint
+      ENV_FILE: /etc/anan-blueprint/app.env
+      HEALTH_URL: https://ananalmasri.com/health
+      STATS_URL: https://ananalmasri.com/api/stats
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.ref || github.ref }}
+
+      - name: Resolve deploy ref + SHA
+        id: meta
+        run: |
+          set -euo pipefail
+          DEPLOY_REF="${{ github.event.inputs.ref || github.ref }}"
+          DEPLOY_SHA="$(git rev-parse HEAD)"
+          echo "ref=${DEPLOY_REF}" >> "$GITHUB_OUTPUT"
+          echo "sha=${DEPLOY_SHA}" >> "$GITHUB_OUTPUT"
+          echo "Deploying ref=${DEPLOY_REF} sha=${DEPLOY_SHA}"
+
+      - name: Run deploy
+        id: deploy
+        run: |
+          set -euo pipefail
+          chmod +x scripts/deploy.sh
+          ./scripts/deploy.sh
+
+      - name: Healthcheck (public)
+        if: success()
+        run: |
+          set -euo pipefail
+          curl -fsS --retry 5 --retry-delay 2 "$HEALTH_URL" >/dev/null
+          echo "✅ /health OK"
+          # Extra /api/stats JSON-shape probe — catches the case where
+          # /health is 200 but the React bundle or stats payload is broken.
+          curl -fsS --retry 5 --retry-delay 2 "$STATS_URL" \
+            | jq -e '.cpu and .memory and .uptime' >/dev/null
+          echo "✅ /api/stats OK"
+
+      - name: Summarize
+        if: always()
+        run: |
+          {
+            echo "### Deploy summary"
+            echo "- Repository: ${{ github.repository }}"
+            echo "- Trigger: ${{ github.event_name }}"
+            echo "- Ref: ${{ steps.meta.outputs.ref }}"
+            echo "- SHA: ${{ steps.meta.outputs.sha }}"
+            echo "- Result: ${{ job.status }}"
+            echo "- Host: \`$(hostname)\`"
+          } >> "$GITHUB_STEP_SUMMARY"

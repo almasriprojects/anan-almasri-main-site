@@ -1,0 +1,95 @@
+name: Healthcheck
+
+on:
+  # Hourly cron. 17/minute offset so two repos on the same org don't probe
+  # the site at the exact same instant.
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+# Hourly checks are idempotent and cheap. Don't serialize them — let them
+# run in parallel so a slow probe doesn't queue the next.
+concurrency:
+  group: healthcheck-${{ github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  healthcheck:
+    name: Probe public endpoints
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      SITE_URL: https://ananalmasri.com
+      # Optional Slack/Discord webhook URL for failure pings. Leave empty to
+      # only rely on the GitHub Actions job summary + email notifications.
+      ALERT_WEBHOOK: ${{ secrets.HEALTHCHECK_ALERT_WEBHOOK }}
+    steps:
+      - name: Probe /health
+        id: health
+        run: |
+          set -euo pipefail
+          HTTP_CODE=$(curl -sS -o /tmp/health.body -w "%{http_code}" \
+                            --retry 3 --retry-delay 2 "$SITE_URL/health")
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "❌ /health returned $HTTP_CODE"
+            cat /tmp/health.body || true
+            exit 1
+          fi
+          echo "✅ /health 200"
+
+      - name: Probe / (must be HTML)
+        run: |
+          set -euo pipefail
+          CT=$(curl -sS -o /tmp/root.html -D /tmp/root.headers \
+                     --retry 3 --retry-delay 2 "$SITE_URL/")
+          CTYPE=$(grep -i '^content-type:' /tmp/root.headers | head -n1 | tr -d '\r')
+          if ! grep -qi 'text/html' <<<"$CTYPE"; then
+            echo "❌ / did not return HTML (got: $CTYPE)"
+            exit 1
+          fi
+          if ! grep -qi 'id="root"' /tmp/root.html; then
+            echo "❌ / does not contain the React #root mount node"
+            exit 1
+          fi
+          echo "✅ / serves the React shell"
+
+      - name: Probe /legacy (preserved route)
+        run: |
+          set -euo pipefail
+          HTTP_CODE=$(curl -sS -o /dev/null -w "%{http_code}" \
+                            --retry 3 --retry-delay 2 "$SITE_URL/legacy")
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "❌ /legacy returned $HTTP_CODE"
+            exit 1
+          fi
+          echo "✅ /legacy 200"
+
+      - name: Probe /api/stats (shape)
+        run: |
+          set -euo pipefail
+          curl -fsS --retry 3 --retry-delay 2 "$SITE_URL/api/stats" \
+            | jq -e '.cpu and .memory and .uptime' >/dev/null
+          echo "✅ /api/stats shape OK"
+
+      - name: Summarize
+        if: always()
+        run: |
+          {
+            echo "### Healthcheck summary"
+            echo "- Site: $SITE_URL"
+            echo "- Result: ${{ job.status }}"
+            echo "- Trigger: ${{ github.event_name }}"
+            echo "- Run: ${{ github.run_id }}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Alert (failure)
+        if: failure() && env.ALERT_WEBHOOK != ''
+        run: |
+          set -euo pipefail
+          PAYLOAD=$(jq -nc \
+            --arg text "🚨 $SITE_URL failed the hourly healthcheck (${{ job.status }})" \
+            --arg run  "${{ github.run_id }}" \
+            '{content:null, text: ($text + " — run " + $run)}')
+          curl -fsS -X POST -H "Content-Type: application/json" \
+               --data "$PAYLOAD" "$ALERT_WEBHOOK" >/dev/null
+          echo "Alert sent."
