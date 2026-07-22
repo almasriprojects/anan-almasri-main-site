@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import { useReducedMotion } from "../hooks/useReducedMotion";
 import { Check } from "lucide-react";
+import { motionTokens } from "../lib/motion";
+import { StaggerGroup, StaggerItem } from "./motion/StaggerGroup";
 
 type Revision = {
   rev: string;
@@ -103,33 +105,62 @@ const bom = [
   { category: "Payments", items: ["Stripe"] },
 ];
 
+function SectionHeading({ label, title, sub }: { label: string; title: string; sub?: string }) {
+  const reduced = useReducedMotion();
+  return (
+    <motion.div
+      initial={reduced ? false : { opacity: 0, y: motionTokens.y.base }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: motionTokens.dur.base, ease: motionTokens.ease }}
+      className="mb-10 max-w-2xl"
+    >
+      <div className="mb-4 flex items-center gap-3 font-mono text-[11px] tracking-annotation text-blueprint-muted">
+        <motion.span
+          aria-hidden="true"
+          initial={reduced ? false : { scaleX: 0 }}
+          whileInView={{ scaleX: 1 }}
+          viewport={{ once: true, margin: "-40px" }}
+          transition={{
+            duration: motionTokens.dur.base,
+            delay: 0.1,
+            ease: motionTokens.ease,
+          }}
+          style={{ transformOrigin: "left center" }}
+          className="h-px w-8 bg-blueprint-brass/70"
+        />
+        {label}
+      </div>
+      <h2 className="font-mono text-3xl font-bold text-blueprint-paper sm:text-4xl">
+        {title}
+      </h2>
+      {sub && <p className="mt-3 font-sans text-sm text-blueprint-muted">{sub}</p>}
+    </motion.div>
+  );
+}
+
 export default function Experience() {
   const reduced = useReducedMotion();
 
   return (
     <section id="experience" className="relative bp-grid py-24 md:py-32">
       <div className="relative mx-auto max-w-7xl px-6 md:px-10">
-        {/* ──────────────────────────────────────────────────────────
-            PART 1 — REVISION HISTORY
-        ────────────────────────────────────────────────────────── */}
-        <motion.div
-          initial={reduced ? false : { opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="mb-14 max-w-2xl"
-        >
-          <div className="mb-4 flex items-center gap-3 font-mono text-[11px] tracking-annotation text-blueprint-muted">
-            <span className="h-px w-8 bg-blueprint-brass/70" />
-            CAREER LOG
-          </div>
-          <h2 className="font-mono text-3xl font-bold text-blueprint-paper sm:text-4xl">
-            Revision History
-          </h2>
-        </motion.div>
+        {/* ─── PART 1 — REVISION HISTORY ─── */}
+        <SectionHeading label="CAREER LOG" title="Revision History" />
 
         {/* Revision block — table on desktop, stacked cards on mobile */}
-        <div className="border-t border-blueprint-grid/20">
+        <div className="relative border-t border-blueprint-grid/20">
+          {/* Growing brass left rail that scales in as the user scrolls into the section */}
+          <motion.span
+            aria-hidden="true"
+            initial={reduced ? false : { scaleY: 0 }}
+            whileInView={{ scaleY: 1 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: motionTokens.dur.slow, ease: motionTokens.ease }}
+            style={{ transformOrigin: "top center" }}
+            className="pointer-events-none absolute left-0 top-0 hidden h-full w-px bg-gradient-to-b from-blueprint-brass/40 via-blueprint-brass/10 to-transparent md:block"
+          />
+
           {/* column header (desktop only) */}
           <div className="hidden md:grid grid-cols-[60px_160px_1fr] gap-6 border-b border-blueprint-grid/20 py-3 font-mono text-[10px] tracking-annotation text-blueprint-muted/70">
             <span>REV</span>
@@ -141,13 +172,15 @@ export default function Experience() {
             {revisions.map((r, i) => (
               <motion.li
                 key={r.rev}
-                initial={reduced ? false : { opacity: 0, y: 16 }}
+                initial={
+                  reduced ? false : { opacity: 0, y: motionTokens.y.base }
+                }
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-40px" }}
                 transition={{
-                  duration: 0.45,
-                  delay: i * 0.1,
-                  ease: "easeOut",
+                  duration: motionTokens.dur.base,
+                  delay: i * 0.06,
+                  ease: motionTokens.ease,
                 }}
                 className="group relative py-6 md:py-7"
               >
@@ -222,31 +255,23 @@ export default function Experience() {
                 </div>
 
                 {/* hover hairline accent on the left edge */}
-                <span className="absolute left-0 top-1/2 hidden h-6 w-[2px] -translate-y-1/2 bg-blueprint-brass/0 transition-colors duration-300 group-hover:bg-blueprint-brass/60 md:block" />
+                <motion.span
+                  aria-hidden="true"
+                  initial={{ opacity: 0 }}
+                  whileHover={{ opacity: 1 }}
+                  className="absolute left-0 top-1/2 hidden h-6 w-[2px] -translate-y-1/2 bg-blueprint-brass/60 md:block"
+                />
               </motion.li>
             ))}
           </ol>
         </div>
 
-        {/* ──────────────────────────────────────────────────────────
-            PART 2 — PERFORMANCE DATA
-        ────────────────────────────────────────────────────────── */}
-        <motion.div
-          initial={reduced ? false : { opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="mt-24 md:mt-32"
-        >
-          <div className="mb-10 max-w-2xl">
-            <div className="mb-4 flex items-center gap-3 font-mono text-[11px] tracking-annotation text-blueprint-muted">
-              <span className="h-px w-8 bg-blueprint-brass/70" />
-              PERFORMANCE DATA — MEASURED OUTCOMES
-            </div>
-            <h2 className="font-mono text-3xl font-bold text-blueprint-paper sm:text-4xl">
-              Results
-            </h2>
-          </div>
+        {/* ─── PART 2 — PERFORMANCE DATA (weave reveal) ─── */}
+        <div className="mt-24 md:mt-32">
+          <SectionHeading
+            label="PERFORMANCE DATA — MEASURED OUTCOMES"
+            title="Results"
+          />
 
           {/* column header (desktop only) */}
           <div className="hidden md:grid grid-cols-[1fr_140px_1fr] gap-6 border-t border-b border-blueprint-grid/20 py-3 font-mono text-[10px] tracking-annotation text-blueprint-muted/70">
@@ -255,22 +280,18 @@ export default function Experience() {
             <span>CONTEXT</span>
           </div>
 
-          {/* two-column grid on desktop, single column on mobile */}
-          <div className="grid grid-cols-1 gap-x-12 md:grid-cols-2">
-            {performanceData.map((row, i) => (
-              <motion.div
-                key={`${row.metric}-${i}`}
-                initial={reduced ? false : { opacity: 0, y: 14 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-40px" }}
-                transition={{
-                  duration: 0.4,
-                  delay: (i % 2) * 0.06 + Math.floor(i / 2) * 0.04,
-                  ease: "easeOut",
-                }}
+          <StaggerGroup
+            as="div"
+            staggerChildren={0.05}
+            delayChildren={0.05}
+            className="grid grid-cols-1 gap-x-12 md:grid-cols-2"
+          >
+            {performanceData.map((row) => (
+              <StaggerItem
+                key={`${row.metric}-${row.result}`}
+                as="div"
                 className="border-b border-blueprint-grid/15 py-5"
               >
-                {/* desktop row */}
                 <div className="hidden md:grid grid-cols-[1fr_140px_1fr] gap-6 items-baseline">
                   <span className="font-sans text-[14px] text-blueprint-paper/90">
                     {row.metric}
@@ -283,7 +304,6 @@ export default function Experience() {
                   </span>
                 </div>
 
-                {/* mobile stacked */}
                 <div className="md:hidden">
                   <span className="block font-sans text-[14px] text-blueprint-paper/90">
                     {row.metric}
@@ -295,52 +315,37 @@ export default function Experience() {
                     {row.context}
                   </span>
                 </div>
-              </motion.div>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerGroup>
 
           <p className="mt-6 font-sans text-[13px] text-blueprint-muted">
-            Full detail available in the downloadable resume below.
+            Full detail available in the downloadable resume above.
           </p>
-        </motion.div>
+        </div>
 
-        {/* ──────────────────────────────────────────────────────────
-            PART 3 — BILL OF MATERIALS
-        ────────────────────────────────────────────────────────── */}
-        <motion.div
-          initial={reduced ? false : { opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="mt-24 md:mt-32"
-        >
-          <div className="mb-10 max-w-2xl">
-            <div className="mb-4 flex items-center gap-3 font-mono text-[11px] tracking-annotation text-blueprint-muted">
-              <span className="h-px w-8 bg-blueprint-brass/70" />
-              BOM — SKILLS
-            </div>
-            <h2 className="font-mono text-3xl font-bold text-blueprint-paper sm:text-4xl">
-              Bill of Materials
-            </h2>
-          </div>
+        {/* ─── PART 3 — BILL OF MATERIALS (scale-in stagger) ─── */}
+        <div className="mt-24 md:mt-32">
+          <SectionHeading label="BOM — SKILLS" title="Bill of Materials" />
 
-          {/* Responsive grid of category blocks:
-              1 col (mobile) → 2 cols (sm) → 3 cols (lg) */}
-          <div className="grid grid-cols-1 gap-px border-t border-l border-blueprint-grid/20 bg-blueprint-grid/10 sm:grid-cols-2 lg:grid-cols-3">
+          <StaggerGroup
+            as="div"
+            staggerChildren={0.06}
+            delayChildren={0.05}
+            className="grid grid-cols-1 gap-px border-t border-l border-blueprint-grid/20 bg-blueprint-grid/10 sm:grid-cols-2 lg:grid-cols-3"
+          >
             {bom.map((group) => (
-              <div
+              <StaggerItem
                 key={group.category}
-                className="relative border-b border-r border-blueprint-grid/20 bg-blueprint-surface/40 p-6 md:p-7"
+                as="div"
+                className="group relative border-b border-r border-blueprint-grid/20 bg-blueprint-surface/40 p-6 md:p-7 hover:bg-blueprint-surface/60 transition-colors"
               >
-                {/* brass top edge — subtle title-block accent */}
-                <span className="absolute left-0 top-0 h-px w-10 bg-blueprint-brass/60" />
-
+                <span className="absolute left-0 top-0 h-px w-10 bg-blueprint-brass/60 transition-all duration-500 group-hover:w-20" />
                 <div className="mb-4 flex items-center gap-2">
                   <span className="font-mono text-[11px] tracking-annotation text-blueprint-muted">
                     {group.category}
                   </span>
                 </div>
-
                 <ul className="flex flex-wrap gap-2">
                   {group.items.map((item) => (
                     <li
@@ -351,59 +356,14 @@ export default function Experience() {
                     </li>
                   ))}
                 </ul>
-              </div>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerGroup>
 
           <p className="mt-6 font-sans text-[13px] text-blueprint-muted">
-            Bilingual — English &amp; Arabic. MENA market experience.
+            Bilingual — English & Arabic. MENA market experience.
           </p>
-        </motion.div>
-
-        {/* ──────────────────────────────────────────────────────────
-            PART 4 — RESUME PANEL
-        ────────────────────────────────────────────────────────── */}
-        <motion.div
-          initial={reduced ? false : { opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="mt-24 md:mt-32"
-        >
-          <div className="relative border border-blueprint-grid/20 bg-blueprint-surface/50 p-8 md:p-12">
-            {/* brass top edge */}
-            <span className="absolute left-0 top-0 h-[2px] w-full bg-blueprint-brass/70" />
-            {/* corner ticks */}
-            <span className="absolute right-3 top-3 h-3 w-3 border-r border-t border-blueprint-brass/50" />
-            <span className="absolute bottom-3 left-3 h-3 w-3 border-b border-l border-blueprint-brass/50" />
-
-            <div className="flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
-              <div>
-                <div className="mb-3 font-mono text-[11px] tracking-annotation text-blueprint-muted">
-                  OUTPUT — FULL SPEC
-                </div>
-                <h3 className="font-mono text-xl font-semibold text-blueprint-paper">
-                  Full Resume
-                </h3>
-                <p className="mt-2 font-sans text-[14px] text-blueprint-muted">
-                  Complete career history, references, and project archive.
-                </p>
-              </div>
-
-              <div className="flex flex-col items-start gap-2 md:items-end">
-                <a
-                  href="#"
-                  className="inline-flex items-center gap-2 rounded-sm bg-blueprint-brass px-5 py-3 font-mono text-[12px] font-semibold tracking-annotation text-blueprint-bg transition-colors duration-200 hover:bg-blueprint-brass/90"
-                >
-                  Download Full Resume (PDF)
-                </a>
-                <span className="font-mono text-[11px] text-blueprint-muted/70">
-                  Last updated: [DATE]
-                </span>
-              </div>
-            </div>
-          </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

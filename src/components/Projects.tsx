@@ -4,6 +4,8 @@ import TickMarks from "./TickMarks";
 import SheetIndex from "./SheetIndex";
 import CaseStudySheet from "./CaseStudySheet";
 import { projects } from "../data/projectsData";
+import { motionTokens } from "../lib/motion";
+import { StaggerGroup, StaggerItem } from "./motion/StaggerGroup";
 
 export default function Projects() {
   const reduced = useReducedMotion();
@@ -15,14 +17,26 @@ export default function Projects() {
 
         {/* section header */}
         <motion.div
-          initial={reduced ? false : { opacity: 0, y: 20 }}
+          initial={reduced ? false : { opacity: 0, y: motionTokens.y.base }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
+          transition={{ duration: motionTokens.dur.base, ease: motionTokens.ease }}
           className="mb-14 max-w-2xl"
         >
           <div className="mb-4 flex items-center gap-3 font-mono text-[11px] tracking-annotation text-blueprint-muted">
-            <span className="h-px w-8 bg-blueprint-brass/70" />
+            <motion.span
+              aria-hidden="true"
+              initial={reduced ? false : { scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{
+                duration: motionTokens.dur.base,
+                delay: 0.1,
+                ease: motionTokens.ease,
+              }}
+              style={{ transformOrigin: "left center" }}
+              className="h-px w-8 bg-blueprint-brass/70"
+            />
             DRAWING SET — PROJECT INDEX
           </div>
           <h2 className="font-mono text-3xl font-bold text-blueprint-paper sm:text-4xl">
@@ -30,17 +44,24 @@ export default function Projects() {
           </h2>
         </motion.div>
 
-        {/* Part 1 — Sheet Index */}
+        {/* Part 1 — Sheet Index (slide-in cascade) */}
         <div className="mb-20 md:mb-24">
           <SheetIndex />
         </div>
 
-        {/* Part 2 — Case Study Sheets */}
-        <div className="space-y-10 md:space-y-12">
+        {/* Part 2 — Case Study Sheets (stagger reveal) */}
+        <StaggerGroup
+          as="div"
+          staggerChildren={0.15}
+          delayChildren={0.05}
+          className="space-y-10 md:space-y-12"
+        >
           {projects.map((p, i) => (
-            <CaseStudySheet key={p.sheetNo} project={p} index={i} />
+            <StaggerItem key={p.sheetNo} as="div">
+              <CaseStudySheet project={p} index={i} />
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerGroup>
       </div>
     </section>
   );

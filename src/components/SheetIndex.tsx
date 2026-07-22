@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import { useReducedMotion } from "../hooks/useReducedMotion";
 import { projects } from "../data/projectsData";
+import { motionTokens } from "../lib/motion";
+import { StaggerGroup, StaggerItem } from "./motion/StaggerGroup";
 
 export default function SheetIndex() {
   const reduced = useReducedMotion();
@@ -14,22 +16,23 @@ export default function SheetIndex() {
         <span>TYPE</span>
       </div>
 
-      <ol className="divide-y divide-blueprint-grid/15">
-        {projects.map((p, i) => (
-          <motion.li
-            key={p.sheetNo}
-            initial={reduced ? false : { opacity: 0, y: 14 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-40px" }}
-            transition={{
-              duration: 0.4,
-              delay: i * 0.06,
-              ease: "easeOut",
-            }}
-          >
-            <a
+      <StaggerGroup
+        as="ol"
+        staggerChildren={0.05}
+        delayChildren={0.05}
+        className="divide-y divide-blueprint-grid/15"
+      >
+        {projects.map((p) => (
+          <StaggerItem key={p.sheetNo} as="li" className="">
+            <motion.a
               href={`#sheet-${p.sheetNo}`}
-              className="group block py-4 md:py-5 transition-colors duration-200"
+              whileHover={
+                reduced
+                  ? undefined
+                  : { x: 4, backgroundColor: "rgba(201,161,93,0.05)" }
+              }
+              transition={{ duration: motionTokens.dur.fast, ease: motionTokens.ease }}
+              className="group block py-4 md:py-5"
             >
               {/* desktop row */}
               <div className="hidden md:grid grid-cols-[100px_1fr_220px] gap-6 items-baseline">
@@ -58,10 +61,10 @@ export default function SheetIndex() {
                   {p.type}
                 </span>
               </div>
-            </a>
-          </motion.li>
+            </motion.a>
+          </StaggerItem>
         ))}
-      </ol>
+      </StaggerGroup>
     </div>
   );
 }

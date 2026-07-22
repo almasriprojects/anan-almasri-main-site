@@ -5,10 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:server": "node server.js",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tanstack/react-router": "^1.95.0",
     "express": "^4.19.2",
     "framer-motion": "^11.0.0",
     "lucide-react": "^0.344.0",

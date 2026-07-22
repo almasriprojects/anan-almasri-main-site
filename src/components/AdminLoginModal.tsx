@@ -1,8 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 
-import { useNavigate } from "@tanstack/react-router";
-
 const OTP_WEBHOOK_URL =
   (import.meta as any).env?.VITE_ADMIN_OTP_WEBHOOK_URL ??
   "https://n8n.ananalmasri.com/webhook/admin-login";
@@ -18,7 +16,6 @@ export default function AdminLoginModal({ isOpen, onClose }: AdminLoginModalProp
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
 
   function normalizeN8nResponse(raw: any) {
     if (Array.isArray(raw) && raw.length > 0) {
@@ -84,7 +81,7 @@ export default function AdminLoginModal({ isOpen, onClose }: AdminLoginModalProp
       }
 
       onClose();
-      navigate({ to: "/dashboard" });
+      window.location.href = "/dashboard";
     } catch (err) {
       setError((err as Error).message);
     } finally {

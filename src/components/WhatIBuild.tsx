@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useReducedMotion } from "../hooks/useReducedMotion";
+import { motionTokens, fadeUp } from "../lib/motion";
 
 const items = [
   {
@@ -20,13 +21,13 @@ export default function WhatIBuild() {
   const reduced = useReducedMotion();
 
   return (
-    <section className="relative border-t border-blueprint-grid/15 bg-blueprint-surface/30 py-24 md:py-32">
+    <section
+      id="whatibuild"
+      className="relative border-t border-blueprint-grid/15 bg-blueprint-surface/30 py-24 md:py-32"
+    >
       <div className="mx-auto max-w-7xl px-6 md:px-10">
         <motion.div
-          initial={reduced ? false : { opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
+          {...fadeUp(reduced)}
           className="mb-14 max-w-2xl"
         >
           <div className="mb-4 flex items-center gap-3 font-mono text-[11px] tracking-annotation text-blueprint-muted">
@@ -38,17 +39,34 @@ export default function WhatIBuild() {
           </h2>
         </motion.div>
 
-        <div className="grid grid-cols-1 gap-px border-t border-l border-blueprint-grid/20 bg-blueprint-grid/10 md:grid-cols-3">
+        <div
+          className="grid grid-cols-1 gap-px border-t border-l border-blueprint-grid/20 bg-blueprint-grid/10 md:grid-cols-3"
+          style={{ perspective: "1200px" }}
+        >
           {items.map((it, i) => (
             <motion.div
               key={it.label}
-              initial={reduced ? false : { opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.45, delay: i * 0.08, ease: "easeOut" }}
-              className="relative border-b border-r border-blueprint-grid/20 bg-blueprint-bg/40 p-8 md:p-10"
+              initial={
+                reduced
+                  ? false
+                  : { opacity: 0, y: motionTokens.y.base, rotateX: -18 }
+              }
+              whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{
+                duration: motionTokens.dur.slow,
+                delay: i * motionTokens.stagger.loose,
+                ease: motionTokens.ease,
+              }}
+              whileHover={
+                reduced
+                  ? undefined
+                  : { y: -4, boxShadow: "0 0 0 1px rgba(201,161,93,0.35), 0 12px 40px -10px rgba(201,161,93,0.25)" }
+              }
+              style={{ transformStyle: "preserve-3d" }}
+              className="group relative border-b border-r border-blueprint-grid/20 bg-blueprint-bg/40 p-8 md:p-10"
             >
-              <span className="absolute left-0 top-0 h-px w-10 bg-blueprint-brass/60" />
+              <span className="absolute left-0 top-0 h-px w-10 bg-blueprint-brass/60 transition-all duration-500 group-hover:w-20" />
               <div className="mb-3 font-mono text-[11px] tracking-annotation text-blueprint-brass/80">
                 {it.label}
               </div>
