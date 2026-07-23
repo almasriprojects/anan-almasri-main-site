@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { tanstackRouter } from '@tanstack/router-plugin/vite'
 
 // https://vitejs.dev/config/
 // `npm run dev` (Vite, :5173) only serves the React SPA. The /api/*
@@ -10,7 +11,13 @@ import react from '@vitejs/plugin-react'
 //
 // Workflow: `node server.js` in one terminal, `npm run dev` in another.
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    // Generates src/routeTree.gen.ts from src/routes/** — must run before
+    // the React plugin so the generated route tree is available for JSX
+    // transforms. Powers the /dashboard/* route tree (AnanOS demo shell).
+    tanstackRouter({ routesDirectory: 'src/routes', generatedRouteTree: 'src/routeTree.gen.ts' }),
+    react(),
+  ],
   optimizeDeps: {
     exclude: ['lucide-react'],
   },

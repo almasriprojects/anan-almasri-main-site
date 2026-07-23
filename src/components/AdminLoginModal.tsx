@@ -1,10 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 
-const OTP_WEBHOOK_URL =
-  (import.meta as any).env?.VITE_ADMIN_OTP_WEBHOOK_URL ??
-  "https://n8n.ananalmasri.com/webhook/admin-login";
-
 interface AdminLoginModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -17,31 +13,18 @@ export default function AdminLoginModal({ isOpen, onClose }: AdminLoginModalProp
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  function normalizeN8nResponse(raw: any) {
-    if (Array.isArray(raw) && raw.length > 0) {
-      const firstItem = raw[0];
-      return firstItem?.json ?? firstItem;
-    }
-    if (raw?.json) {
-      return raw.json;
-    }
-    return raw;
-  }
-
   async function requestOtp() {
     setLoading(true);
     setError(null);
     setMessage(null);
 
     try {
-      const response = await fetch(OTP_WEBHOOK_URL, {
+      const response = await fetch("/api/admin/request-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "request_code" }),
       });
 
-      const rawData = await response.json();
-      const data = normalizeN8nResponse(rawData);
+      const data = await response.json();
 
       if (!response.ok || data?.success === false) {
         throw new Error(data?.message ?? "Unable to request OTP. Please try again.");
@@ -67,14 +50,14 @@ export default function AdminLoginModal({ isOpen, onClose }: AdminLoginModalProp
     setMessage(null);
 
     try {
-      const response = await fetch(OTP_WEBHOOK_URL, {
+      const response = await fetch("/api/admin/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "verify_code", code: otp.trim() }),
+        credentials: "same-origin",
+        body: JSON.stringify({ code: otp.trim() }),
       });
 
-      const rawData = await response.json();
-      const data = normalizeN8nResponse(rawData);
+      const data = await response.json();
 
       if (!response.ok || data?.success !== true) {
         throw new Error(data?.message ?? "Invalid code. Please try again.");

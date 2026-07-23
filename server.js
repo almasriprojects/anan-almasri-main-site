@@ -7,10 +7,15 @@ import { existsSync } from "node:fs";
 import { hostname, platform, arch, cpus, uptime, networkInterfaces } from "node:os";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
+import { createHmac, timingSafeEqual } from "node:crypto";
 
 const execFileP = promisify(execFile);
 const app = express();
 const PORT = process.env.PORT || 8080;
+// We're always behind Cloudflare Tunnel in production, which terminates TLS
+// and forwards over plain HTTP — trust its X-Forwarded-Proto so `secure`
+// cookies (below) are set correctly instead of silently never being sent.
+app.set("trust proxy", 1);
 // STATIC_DIR resolution order:
 //   1. Explicit STATIC_DIR env var (production dockerfile sets nothing —
 //      `/usr/share/nginx/html` is hardcoded in the Dockerfile).
@@ -24,6 +29,13 @@ function resolveStaticDir() {
 }
 const STATIC_DIR = resolveStaticDir();
 console.log(`[server] static dir resolved to: ${STATIC_DIR}`);
+
+// Admin login (Telegram OTP via n8n, server-side session cookie)
+const ADMIN_OTP_WEBHOOK_URL =
+  process.env.ADMIN_OTP_WEBHOOK_URL || "https://n8n.ananalmasri.com/webhook/admin-login";
+const ADMIN_SESSION_SECRET = process.env.ADMIN_SESSION_SECRET || "";
+const ADMIN_SESSION_COOKIE = "admin_session";
+const ADMIN_SESSION_TTL_MS = 24 * 60 * 60 * 1000; // 24h
 
 // Chat config (server-side only — keys never reach the browser)
 // Primary upstream: your n8n chatbot webhook. Production path preferred.
@@ -282,6 +294,116 @@ app.get("/api/stats", async (_req, res) => {
 app.get("/health", (_req, res) => {
   res.set("Cache-Control", "no-store");
   res.status(200).send("ok");
+});
+
+// ─── Admin session helpers ────────────────────────────────────────
+// Signed, stateless session token: base64url(payload).base64url(hmac).
+// No new dependency — Node's built-in crypto is enough for one cookie.
+function signAdminSession(exp) {
+  const payload = Buffer.from(JSON.stringify({ exp })).toString("base64url");
+  const sig = createHmac("sha256", ADMIN_SESSION_SECRET).update(payload).digest("base64url");
+  return `${payload}.${sig}`;
+}
+
+function verifyAdminSession(token) {
+  if (!token || !ADMIN_SESSION_SECRET) return false;
+  const parts = token.split(".");
+  if (parts.length !== 2) return false;
+  const [payload, sig] = parts;
+  const expectedSig = createHmac("sha256", ADMIN_SESSION_SECRET).update(payload).digest("base64url");
+  const a = Buffer.from(sig);
+  const b = Buffer.from(expectedSig);
+  if (a.length !== b.length || !timingSafeEqual(a, b)) return false;
+  try {
+    const { exp } = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
+    return typeof exp === "number" && Date.now() < exp;
+  } catch {
+    return false;
+  }
+}
+
+function parseCookies(req) {
+  const header = req.headers.cookie;
+  if (!header) return {};
+  const out = {};
+  for (const part of header.split(";")) {
+    const idx = part.indexOf("=");
+    if (idx === -1) continue;
+    out[part.slice(0, idx).trim()] = decodeURIComponent(part.slice(idx + 1).trim());
+  }
+  return out;
+}
+
+// n8n responses vary by workflow shape (plain object, array of node results,
+// or `{ json: {...} }`) — unwrap to the actual payload.
+function normalizeAdminResponse(raw) {
+  if (Array.isArray(raw) && raw.length > 0) {
+    const first = raw[0];
+    return first?.json ?? first;
+  }
+  if (raw?.json) return raw.json;
+  return raw;
+}
+
+// ─── /api/admin/* endpoints (Telegram OTP via n8n) ────────────────
+app.post("/api/admin/request-otp", express.json({ limit: "4kb" }), async (_req, res) => {
+  try {
+    const r = await fetch(ADMIN_OTP_WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "request_code" }),
+    });
+    const raw = await r.json().catch(() => null);
+    const data = normalizeAdminResponse(raw) ?? {};
+    if (!r.ok || data?.success === false) {
+      return res.status(502).json({ success: false, message: data?.message ?? "Unable to request OTP." });
+    }
+    res.json({ success: true, message: data?.message ?? "OTP sent to Telegram." });
+  } catch (err) {
+    res.status(502).json({ success: false, message: String(err) });
+  }
+});
+
+app.post("/api/admin/verify-otp", express.json({ limit: "4kb" }), async (req, res) => {
+  try {
+    const code = typeof req.body?.code === "string" ? req.body.code.trim() : "";
+    if (!code) {
+      return res.status(400).json({ success: false, message: "Please enter the code you received." });
+    }
+    const r = await fetch(ADMIN_OTP_WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "verify_code", code }),
+    });
+    const raw = await r.json().catch(() => null);
+    const data = normalizeAdminResponse(raw) ?? {};
+
+    if (!r.ok || data?.success !== true) {
+      return res.status(401).json({ success: false, message: data?.message ?? "Invalid code. Please try again." });
+    }
+    if (!ADMIN_SESSION_SECRET) {
+      console.warn("[admin] ADMIN_SESSION_SECRET is not set — refusing to issue a session");
+      return res.status(500).json({ success: false, message: "Server is not configured for admin login." });
+    }
+
+    const token = signAdminSession(Date.now() + ADMIN_SESSION_TTL_MS);
+    res.cookie(ADMIN_SESSION_COOKIE, token, {
+      httpOnly: true,
+      secure: "auto", // real TLS via trust proxy in prod, plain http in local dev
+      sameSite: "strict",
+      maxAge: ADMIN_SESSION_TTL_MS,
+      path: "/",
+    });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, message: String(err) });
+  }
+});
+
+app.get("/api/admin/session", (req, res) => {
+  const { [ADMIN_SESSION_COOKIE]: token } = parseCookies(req);
+  res.set("Cache-Control", "no-store");
+  res.json({ authenticated: verifyAdminSession(token) });
 });
 
 // ─── /api/chat-log endpoint ──────────────────────────────────────

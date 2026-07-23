@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { RouterProvider } from "@tanstack/react-router";
 import Demo from "./routes/demo";
 import MarketingSite from "./components/MarketingSite";
+import { router } from "./router";
 
 /**
  * Tiny path-based router — zero deps.
@@ -9,8 +11,10 @@ import MarketingSite from "./components/MarketingSite";
  *   `/demo`     → same experience, preserved for the in-page "back to /" link
  *   `/legacy`   → original marketing landing (kept so older links still work)
  *
- * Everything else (including the dashboard route tree) falls through to
- * the marketing site so previously-shared URLs don't dead-end.
+ * Everything else — in practice, the `/dashboard/*` tree — is handed off to
+ * the real TanStack Router instance (see src/router.tsx), which owns the
+ * admin dashboard (AnanOS shell + CRM/Accounting/HRM/etc.) and gates it on
+ * a valid session (src/routes/__root.tsx).
  */
 function usePath() {
   const [path, setPath] = useState(
@@ -34,5 +38,5 @@ export default function App() {
     return <MarketingSite />;
   }
 
-  return <MarketingSite />;
+  return <RouterProvider router={router} />;
 }

@@ -18,7 +18,7 @@ function HomePage() {
 
   return (
     <div className="min-h-screen bg-blueprint-bg text-blueprint-paper">
-      <Navbar onAdminClick={() => setAdminModalOpen(true)} />
+      <Navbar onLoginClick={() => setAdminModalOpen(true)} />
       <AdminLoginModal isOpen={isAdminModalOpen} onClose={() => setAdminModalOpen(false)} />
       <main>
         <Hero />
