@@ -56,6 +56,14 @@ export default function DemoShell() {
         <span className="text-blueprint-grid/60">[</span> AA <span className="text-blueprint-grid/60">]</span>
       </a>
 
+      <button
+        type="button"
+        onClick={() => setIsAdminOpen(true)}
+        className="fixed right-4 top-4 z-40 border border-blueprint-brass/50 px-3 py-1.5 font-mono text-[11px] tracking-annotation text-blueprint-brass backdrop-blur-sm transition-colors hover:bg-blueprint-brass/10 hover:border-blueprint-brass"
+      >
+        Admin
+      </button>
+
       <main className="relative">
         <PlottingHero />
         <AnimatedSystemDiagram />
