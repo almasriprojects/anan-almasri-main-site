@@ -70,7 +70,8 @@ coverage/
 *.seed
 *.pid.lock
 
-# Chat transcripts (per-client)
-data/
+# Chat transcripts (per-client) — anchored to repo root only, so this
+# doesn't also match src/data/ (a real source directory).
+/data/
 data/chat-log.ndjson
 
